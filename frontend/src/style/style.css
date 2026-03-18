@@ -1,0 +1,421 @@
+*{
+box-sizing:border-box;
+margin:0;
+padding:0;
+}
+
+/* FUNDO */
+body{
+background: radial-gradient(circle at top, #020617, #000);
+color:white;
+font-family: 'Segoe UI', sans-serif;
+
+display:flex;
+justify-content:center;
+align-items:flex-start;
+
+min-height:100vh;
+overflow-x:hidden;
+}
+
+/* MATRIX FUNDO */
+#matrix{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+z-index:0;
+}
+
+/* SCAN LINES */
+body::before{
+content:"";
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+
+background: repeating-linear-gradient(
+to bottom,
+rgba(255,255,255,0.02),
+rgba(255,255,255,0.02) 1px,
+transparent 2px,
+transparent 4px
+);
+
+pointer-events:none;
+z-index:1;
+}
+
+/* SCAN ANIMATION */
+body::after{
+content:"";
+position:fixed;
+top:-100%;
+left:0;
+width:100%;
+height:100%;
+
+background: linear-gradient(
+to bottom,
+transparent,
+rgba(34,197,94,0.08),
+transparent
+);
+
+animation: scan 6s linear infinite;
+
+pointer-events:none;
+z-index:1;
+}
+
+@keyframes scan{
+0%{top:-100%}
+100%{top:100%}
+}
+
+/* CONTAINER */
+.container{
+position:relative;
+z-index:10;
+
+width:700px;
+max-width:90%;
+margin-top:60px;
+
+background: rgba(0, 0, 0, 0.2);
+backdrop-filter: blur(25px);
+
+padding:40px;
+
+border-radius:16px;
+
+border:1px solid rgba(34,197,94,0.15);
+
+box-shadow:
+0 0 10px rgba(34,197,94,0.3),
+0 0 40px rgba(34,197,94,0.2);
+}
+
+/* 🔥 TITULO HACKER REAL */
+h1{
+position:relative;
+text-align:center;
+margin-bottom:20px;
+
+color:#00ff9f;
+font-size:42px;
+letter-spacing:3px;
+
+text-shadow:
+0 0 5px #00ff9f,
+0 0 10px #00ff9f,
+0 0 20px #00ff9f;
+
+animation: flicker 2s infinite;
+}
+
+/* GLITCH LAYERS */
+h1::before,
+h1::after{
+content:attr(data-text);
+position:absolute;
+left:0;
+top:0;
+width:100%;
+overflow:hidden;
+}
+
+h1::before{
+color:#ff003c;
+z-index:-1;
+animation: glitchTop 1.5s infinite linear alternate-reverse;
+}
+
+h1::after{
+color:#00e1ff;
+z-index:-2;
+animation: glitchBottom 1.5s infinite linear alternate-reverse;
+}
+
+/* FLICKER */
+@keyframes flicker{
+0%,18%,22%,25%,53%,57%,100%{opacity:1;}
+20%,24%,55%{opacity:0.4;}
+}
+
+/* GLITCH TOP */
+@keyframes glitchTop{
+0%{
+clip-path: inset(0 0 80% 0);
+transform: translate(-2px,-2px);
+}
+50%{
+clip-path: inset(0 0 30% 0);
+transform: translate(2px,2px);
+}
+100%{
+clip-path: inset(0 0 80% 0);
+transform: translate(-2px,0);
+}
+}
+
+/* GLITCH BOTTOM */
+@keyframes glitchBottom{
+0%{
+clip-path: inset(70% 0 0 0);
+transform: translate(2px,0);
+}
+50%{
+clip-path: inset(30% 0 0 0);
+transform: translate(-2px,2px);
+}
+100%{
+clip-path: inset(70% 0 0 0);
+transform: translate(2px,-2px);
+}
+}
+
+/* INPUTS */
+textarea,
+input{
+width:100%;
+padding:14px;
+margin-top:10px;
+
+border-radius:10px;
+
+background: rgba(0,0,0,0.25);
+color:#22c55e;
+
+border:1px solid rgba(34,197,94,0.15);
+
+font-family: monospace;
+font-size:14px;
+
+resize: vertical;
+}
+
+/* FOCUS */
+textarea:focus,
+input:focus{
+outline:none;
+background: rgba(0,0,0,0.35);
+border:1px solid #22c55e;
+
+box-shadow:
+0 0 5px #22c55e,
+0 0 25px rgba(34,197,94,0.8);
+
+caret-color:#22c55e;
+}
+
+/* BOTÕES */
+button{
+width:100%;
+padding:14px;
+margin-top:15px;
+
+border:none;
+border-radius:10px;
+
+background: linear-gradient(135deg,#22c55e,#4ade80);
+
+color:#020617;
+
+font-size:16px;
+font-weight:bold;
+
+cursor:pointer;
+transition:0.3s;
+}
+
+button:hover{
+transform:translateY(-2px) scale(1.02);
+box-shadow:
+0 0 20px #22c55e,
+0 0 40px rgba(34,197,94,0.6);
+}
+
+/* NAVBAR */
+.navbar{
+display:flex;
+justify-content:center;
+gap:15px;
+margin-bottom:25px;
+}
+
+.navbar button{
+width:auto;
+background:#020617;
+border:1px solid #334155;
+color:white;
+}
+
+.navbar button:hover{
+background:#22c55e;
+color:#020617;
+}
+
+/* ALERTAS */
+.erro{
+margin-top:15px;
+padding:12px;
+border-radius:10px;
+background:rgba(255,0,0,0.1);
+border:1px solid #ef4444;
+color:#fecaca;
+}
+
+.sucesso{
+margin-top:15px;
+padding:12px;
+border-radius:10px;
+background:rgba(34,197,94,0.1);
+border:1px solid #22c55e;
+color:#6ee7b7;
+}
+
+/* LINK GERADO */
+.linkBox{
+margin-top:15px;
+padding:15px;
+
+border:1px solid #00ffcc;
+background: rgba(0,255,204,0.05);
+
+color:#00ffcc;
+font-size:14px;
+
+word-break:break-all;
+
+border-radius:10px;
+
+box-shadow:
+0 0 10px rgba(0,255,204,0.2),
+0 0 20px rgba(0,255,204,0.2);
+
+animation: pulseGlow 1.5s infinite alternate;
+}
+
+@keyframes pulseGlow{
+from{box-shadow:0 0 5px #00ffcc;}
+to{box-shadow:0 0 25px #00ffcc;}
+}
+
+/* TERMINAL TEXTO */
+.typewriter{
+font-family:monospace;
+color:#22c55e;
+letter-spacing:2px;
+}
+
+/* CURSOR PISCANDO */
+.cursor::after{
+content:"_";
+animation: blink 1s infinite;
+margin-left:5px;
+}
+
+@keyframes blink{
+0%,50%,100%{opacity:1;}
+25%,75%{opacity:0;}
+}
+
+/* TERMINAL DIGITANDO */
+.terminalLine{
+font-family: monospace;
+color:#22c55e;
+overflow:hidden;
+white-space:nowrap;
+border-right:2px solid #22c55e;
+width:0;
+animation: typing 2s steps(30,end) forwards;
+}
+
+@keyframes typing{
+from{width:0}
+to{width:100%}
+}
+
+/* ACESSO */
+.access{
+margin-top:15px;
+padding:12px;
+text-align:center;
+font-weight:bold;
+border-radius:10px;
+}
+
+.access.ok{
+color:#22c55e;
+border:1px solid #22c55e;
+background:rgba(34,197,94,0.1);
+animation: pulse 1s infinite alternate;
+}
+
+.access.fail{
+color:#ef4444;
+border:1px solid #ef4444;
+background:rgba(255,0,0,0.1);
+animation: shake 0.3s;
+}
+
+/* PULSE */
+@keyframes pulse{
+from{box-shadow:0 0 5px #22c55e;}
+to{box-shadow:0 0 20px #22c55e;}
+}
+
+/* SHAKE ERRO */
+@keyframes shake{
+0%{transform:translateX(0)}
+25%{transform:translateX(-5px)}
+50%{transform:translateX(5px)}
+75%{transform:translateX(-5px)}
+100%{transform:translateX(0)}
+}
+
+/* LOADING BAR */
+.loadingBar{
+width:100%;
+height:8px;
+background:#020617;
+border-radius:10px;
+overflow:hidden;
+margin-top:15px;
+}
+
+.loadingFill{
+height:100%;
+background:linear-gradient(90deg,#22c55e,#4ade80);
+width:0%;
+animation: loading 2s linear forwards;
+}
+
+@keyframes loading{
+0%{width:0%}
+100%{width:100%}
+}
+
+/* FLASH DE DESTRUIÇÃO */
+.flash{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:100%;
+background:#22c55e;
+opacity:0;
+pointer-events:none;
+z-index:999;
+animation: flashAnim 0.5s ease;
+}
+
+@keyframes flashAnim{
+0%{opacity:0}
+50%{opacity:0.4}
+100%{opacity:0}
+}
