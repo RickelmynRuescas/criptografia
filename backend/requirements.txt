@@ -3,5 +3,4 @@ flask-cors
 gunicorn
 uuid
 cryptography
-base64
 hashlib
