@@ -1,7 +1,6 @@
 flask
 flask-cors
 gunicorn
-time
 uuid
 cryptography
 base64
