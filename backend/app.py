@@ -7,10 +7,14 @@ from criptografa import criptografar, descriptografar
 
 app = Flask(__name__)
 
-# ✅ CORS CORRETO
 CORS(app, resources={r"/*": {"origins": "*"}})
 
 mensagens = {}
+
+@app.route("/")
+def home():
+    return jsonify({"status": "API online"}), 200
+
 
 # ----------------------------
 # CRIPTOGRAFAR
@@ -24,7 +28,7 @@ def rota_criptografar():
         return jsonify({"erro": "dados inválidos"}), 400
 
     mensagem = data.get("mensagem")
-    chave = data.get("chave")
+    chave = data.get("chave") or data.get("senha")
 
     if not mensagem or not chave:
         return jsonify({"erro": "mensagem ou chave vazia"}), 400
@@ -38,7 +42,7 @@ def rota_criptografar():
 
 
 # ----------------------------
-# CRIAR LINK (AGORA CRIPTOGRAFA)
+# CRIAR LINK
 # ----------------------------
 @app.route("/criar-link", methods=["POST"])
 def criar_link():
@@ -49,13 +53,12 @@ def criar_link():
         return jsonify({"erro": "dados inválidos"}), 400
 
     mensagem = data.get("mensagem")
-    chave = data.get("chave")
+    chave = data.get("chave") or data.get("senha")
 
     if not mensagem or not chave:
         return jsonify({"erro": "mensagem ou chave vazia"}), 400
 
     try:
-        # 🔐 CRIPTOGRAFA ANTES DE SALVAR
         mensagem_criptografada = criptografar(mensagem, chave)
 
         id_link = str(uuid.uuid4())[:8]
@@ -84,17 +87,12 @@ def ver_mensagem(id):
 
     msg = mensagens[id]
 
-    # expirou
     if time.time() > msg["expira"]:
         del mensagens[id]
         return jsonify({"erro": "expirada"}), 410
 
-    # já foi aberta
     if msg["visualizado"]:
         return jsonify({"erro": "já visualizada"}), 403
-
-    # 🔥 MARCA COMO VISUALIZADA
-    msg["visualizado"] = True
 
     return jsonify({"mensagem": msg["mensagem"]})
 
@@ -124,15 +122,20 @@ def rota_descriptografar():
         return jsonify({"erro": "dados inválidos"}), 400
 
     cript = data.get("cript")
-    chave = data.get("chave")
+    chave = data.get("chave") or data.get("senha")
 
     if not cript or not chave:
         return jsonify({"erro": "dados incompletos"}), 400
 
-    try:    
+    try:
         resultado = descriptografar(cript, chave)
 
         if resultado:
+            for id_link, msg in mensagens.items():
+                if msg["mensagem"] == cript:
+                    msg["visualizado"] = True
+                    break
+
             return jsonify({"resultado": resultado})
         else:
             return jsonify({"erro": "senha incorreta"}), 400
