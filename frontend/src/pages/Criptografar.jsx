@@ -29,11 +29,10 @@ method:"POST",
 headers:{ "Content-Type":"application/json" },
 body: JSON.stringify({
 mensagem: mensagem,
-chave: senha // ✅ PADRÃO
+chave: senha
 })
 })
 
-// 💥 VALIDAÇÃO REAL
 if(!response.ok){
 throw new Error("Erro no servidor")
 }
@@ -64,6 +63,8 @@ setErro("⚠️ Preencha a mensagem e senha")
 return
 }
 
+setErro("")
+
 try{
 
 const response = await fetch("https://criptografia-3.onrender.com/criar-link",{
@@ -71,11 +72,10 @@ method:"POST",
 headers:{ "Content-Type":"application/json" },
 body: JSON.stringify({
 mensagem: mensagem,
-chave: senha // ✅ PADRONIZADO AQUI TAMBÉM
+chave: senha
 })
 })
 
-// 💥 VALIDAÇÃO REAL
 if(!response.ok){
 throw new Error("Erro no servidor")
 }
@@ -125,7 +125,7 @@ onChange={(e)=>setMensagem(e.target.value)}
 type="password"
 value={senha}
 setValue={setSenha}
-placeholder="DDigite uma senha secreta..."
+placeholder="Digite uma senha secreta..."
 />
 
 <button onClick={criptografar}>
