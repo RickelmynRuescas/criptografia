@@ -17,7 +17,7 @@ return
 
 try{
 
-const response = await fetch("http://localhost:5000/descriptografar",{
+const response = await fetch("https://criptografia-3.onrender.com/descriptografar",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
 body: JSON.stringify({
