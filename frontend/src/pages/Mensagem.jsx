@@ -55,7 +55,7 @@ return
 const data = await res.json()
 
 // 🔐 DESCRIPTOGRAFAR
-const response = await fetch("http://localhost:5000/descriptografar",{
+const response = await fetch("https://criptografia-3.onrender.com/descriptografar",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
 body: JSON.stringify({
@@ -121,7 +121,7 @@ if(t <= 1){
 clearInterval(interval)
 
 // 💣 DELETA BACKEND CORRETO
-fetch("http://localhost:5000/deletar/" + id,{
+fetch("https://criptografia-3.onrender.com/deletar/" + id,{
 method:"DELETE"
 })
 
