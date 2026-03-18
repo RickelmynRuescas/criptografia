@@ -28,7 +28,7 @@ setStatus("acessando")
 try{
 
 // 🔎 BUSCA MENSAGEM
-const res = await fetch("http://localhost:5000/mensagem/" + id)
+const res = await fetch("https://criptografia-3.onrender.com/mensagem/" + id)
 
 if(!res.ok){
 
