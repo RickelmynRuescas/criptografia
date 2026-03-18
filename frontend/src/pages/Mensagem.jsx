@@ -27,12 +27,9 @@ setStatus("acessando")
 
 try{
 
-// 🔎 BUSCA MENSAGEM
 const res = await fetch("https://criptografia-3.onrender.com/mensagem/" + id)
 
 if(!res.ok){
-
-const erroData = await res.json()
 
 if(res.status === 404){
 setErro("💀 Mensagem não existe")
@@ -54,7 +51,6 @@ return
 
 const data = await res.json()
 
-// 🔐 DESCRIPTOGRAFAR
 const response = await fetch("https://criptografia-3.onrender.com/descriptografar",{
 method:"POST",
 headers:{ "Content-Type":"application/json" },
@@ -64,10 +60,7 @@ chave: senha
 })
 })
 
-// 💥 TRATAR ERRO DE SENHA AQUI
 if(!response.ok){
-
-const erroData = await response.json()
 
 if(response.status === 400){
 setErro("❌ Senha incorreta")
@@ -96,7 +89,6 @@ setStatus("erro")
 }catch(err){
 
 console.error("ERRO REAL:", err)
-
 setErro("❌ Erro ao conectar com servidor")
 setStatus("erro")
 
@@ -110,7 +102,7 @@ useEffect(()=>{
 
 if(status === "liberado"){
 
-setTempo(10) // 🔁 garante reset correto
+setTempo(10)
 
 const interval = setInterval(()=>{
 
@@ -120,12 +112,10 @@ if(t <= 1){
 
 clearInterval(interval)
 
-// 💣 DELETA BACKEND CORRETO
-fetch("https://criptografia-3.onrender.com/deletar/" + id,{
+fetch("https://criptografia-3.onrender.com/destruir/" + id,{
 method:"DELETE"
 })
 
-// 💥 FLASH VISUAL
 document.body.classList.add("flash")
 setTimeout(()=>document.body.classList.remove("flash"),500)
 
@@ -159,7 +149,7 @@ return(
 type="password"
 value={senha}
 setValue={setSenha}
-placeholder="DDigite a senha..."
+placeholder="Digite a senha..."
 />
 
 <button onClick={desbloquear}>
