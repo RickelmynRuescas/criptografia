@@ -1,169 +1,203 @@
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import Navbar from "../components/Navbar"
 import TerminalInput from "../components/TerminalInput"
+import PasswordStrength from "../components/PasswordStrength"
 
-function Criptografar(){
+const API_URL = import.meta.env.VITE_API_URL || "http://localhost:5000"
 
-const [mensagem,setMensagem] = useState("")
-const [senha,setSenha] = useState("")
-const [resultado,setResultado] = useState("")
-const [loading,setLoading] = useState(false)
-const [link,setLink] = useState("")
-const [erro,setErro] = useState("")
+function Criptografar() {
+  const [mensagem, setMensagem] = useState("")
+  const [senha, setSenha] = useState("")
+  const [resultado, setResultado] = useState("")
+  const [loading, setLoading] = useState(false)
+  const [link, setLink] = useState("")
+  const [erro, setErro] = useState("")
+  const [sucesso, setSucesso] = useState("")
 
-async function criptografar(){
+  const totalCaracteres = useMemo(() => mensagem.length, [mensagem])
 
-if(!mensagem || !senha){
-alert("Preencha a mensagem e a senha")
-return
-}
+  function limparMensagens() {
+    setErro("")
+    setSucesso("")
+  }
 
-setLoading(true)
-setLink("")
-setErro("")
+  function limparCampos() {
+    setMensagem("")
+    setSenha("")
+    setResultado("")
+    setLink("")
+    setErro("")
+    setSucesso("")
+  }
 
-try{
+  async function copiarResultado() {
+    if (!resultado) return
 
-const response = await fetch("https://criptografia-3.onrender.com/criptografar",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body: JSON.stringify({
-mensagem: mensagem,
-chave: senha
-})
-})
+    try {
+      await navigator.clipboard.writeText(resultado)
+      setSucesso("✅ Resultado copiado com sucesso")
+      setErro("")
+    } catch {
+      setErro("❌ Não foi possível copiar o resultado")
+      setSucesso("")
+    }
+  }
 
-if(!response.ok){
-throw new Error("Erro no servidor")
-}
+  async function criptografarMensagem() {
+    limparMensagens()
 
-const data = await response.json()
+    if (!mensagem || !senha) {
+      setErro("⚠️ Preencha a mensagem e a senha")
+      return
+    }
 
-if(data && data.resultado){
-setResultado(data.resultado)
-}else{
-setErro("Erro ao criptografar")
-}
+    setLoading(true)
+    setResultado("")
+    setLink("")
 
-}catch(err){
+    try {
+      const response = await fetch(`${API_URL}/criptografar`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mensagem,
+          chave: senha
+        })
+      })
 
-console.error("ERRO REAL:", err)
-setErro("❌ Erro ao conectar com servidor")
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.erro || "Erro no servidor")
+      }
 
-}
+      const data = await response.json()
 
-setLoading(false)
+      if (data?.resultado) {
+        setResultado(data.resultado)
+        setSucesso("✅ Mensagem criptografada com sucesso")
+      } else {
+        setErro("❌ Erro ao criptografar")
+      }
+    } catch (err) {
+      console.error("ERRO REAL:", err)
+      setErro("❌ Erro ao conectar com o servidor")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-}
+  async function gerarLink() {
+    limparMensagens()
 
-async function gerarLink(){
+    if (!mensagem || !senha) {
+      setErro("⚠️ Preencha a mensagem e a senha")
+      return
+    }
 
-if(!mensagem || !senha){
-setErro("⚠️ Preencha a mensagem e senha")
-return
-}
+    setLoading(true)
+    setLink("")
 
-setErro("")
+    try {
+      const response = await fetch(`${API_URL}/criar-link`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          mensagem,
+          chave: senha
+        })
+      })
 
-try{
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}))
+        throw new Error(errorData.erro || "Erro no servidor")
+      }
 
-const response = await fetch("https://criptografia-3.onrender.com/criar-link",{
-method:"POST",
-headers:{ "Content-Type":"application/json" },
-body: JSON.stringify({
-mensagem: mensagem,
-chave: senha
-})
-})
+      const data = await response.json()
 
-if(!response.ok){
-throw new Error("Erro no servidor")
-}
+      if (data?.link) {
+        const linkFinal = `${window.location.origin}/mensagem/${data.link}`
+        await navigator.clipboard.writeText(linkFinal)
 
-const data = await response.json()
+        setLink(linkFinal)
+        setSucesso("✅ Link secreto gerado e copiado automaticamente")
+      } else {
+        setErro("❌ Erro ao gerar link")
+      }
+    } catch (err) {
+      console.error("ERRO REAL:", err)
+      setErro("❌ Erro ao conectar com o servidor")
+    } finally {
+      setLoading(false)
+    }
+  }
 
-if(data && data.link){
+  return (
+    <div className="container">
+      <Navbar />
 
-const linkFinal = window.location.origin + "/mensagem/" + data.link
+      <h1 data-text="Criptografar">Criptografar</h1>
 
-await navigator.clipboard.writeText(linkFinal)
+      <p className="terminalLine">&gt; Inicializando sistema de criptografia...</p>
 
-setLink(linkFinal)
+      <div className="pageTools">
+        <div className="toolChip">Caracteres: {totalCaracteres}</div>
+        <div className="toolChip">Modo seguro ativo</div>
+      </div>
 
-}else{
-setErro("Erro ao gerar link")
-}
+      <textarea
+        placeholder="Digite sua mensagem..."
+        value={mensagem}
+        onChange={(e) => setMensagem(e.target.value)}
+      />
 
-}catch(err){
+      <TerminalInput
+        type="password"
+        value={senha}
+        setValue={setSenha}
+        placeholder="Digite uma senha secreta..."
+      />
 
-console.error("ERRO REAL:", err)
-setErro("❌ Erro ao conectar com servidor")
+      <PasswordStrength senha={senha} />
 
-}
+      <div className="buttonGroup">
+        <button onClick={criptografarMensagem} disabled={loading}>
+          {loading ? "🔐 Criptografando..." : "Criptografar"}
+        </button>
 
-}
+        <button className="secondaryButton" onClick={limparCampos} disabled={loading}>
+          Limpar campos
+        </button>
+      </div>
 
-return(
+      {loading && (
+        <div className="loadingBar">
+          <div className="loadingFill"></div>
+        </div>
+      )}
 
-<div className="container">
+      <textarea value={resultado} readOnly placeholder="Resultado..." />
 
-<Navbar/>
+      {resultado && (
+        <div className="buttonGroup">
+          <button onClick={copiarResultado}>📋 Copiar resultado</button>
+          <button className="secondaryButton" onClick={gerarLink} disabled={loading}>
+            🔗 Gerar link secreto
+          </button>
+        </div>
+      )}
 
-<h1 data-text="Criptografar">Criptografar</h1>
+      {link && (
+        <div className="linkBox">
+          <strong>📎 Link copiado automaticamente:</strong>
+          <br />
+          {link}
+        </div>
+      )}
 
-<p className="terminalLine">
-&gt; Inicializando sistema de criptografia...
-</p>
-
-<textarea
-placeholder="Digite sua mensagem..."
-value={mensagem}
-onChange={(e)=>setMensagem(e.target.value)}
-/>
-
-<TerminalInput
-type="password"
-value={senha}
-setValue={setSenha}
-placeholder="Digite uma senha secreta..."
-/>
-
-<button onClick={criptografar}>
-{loading ? "🔐 Criptografando..." : "Criptografar"}
-</button>
-
-{loading && (
-<div className="loadingBar">
-<div className="loadingFill"></div>
-</div>
-)}
-
-<textarea
-value={resultado}
-readOnly
-placeholder="Resultado..."
-/>
-
-{resultado && (
-<button onClick={gerarLink}>
-🔗 Gerar link secreto
-</button>
-)}
-
-{link && (
-<div className="linkBox">
-📎 Link copiado automaticamente:
-<br/>
-{link}
-</div>
-)}
-
-{erro && <div className="erro">{erro}</div>}
-
-</div>
-
-)
-
+      {sucesso && <div className="sucesso">{sucesso}</div>}
+      {erro && <div className="erro">{erro}</div>}
+    </div>
+  )
 }
 
 export default Criptografar

@@ -1,28 +1,25 @@
-import { useState, useEffect } from "react"
+import { useEffect, useState } from "react"
 
-function TypeWriter({text}){
+function TypeWriter({ text }) {
+  const [display, setDisplay] = useState("")
 
-const [display,setDisplay] = useState("")
+  useEffect(() => {
+    let i = 0
+    setDisplay("")
 
-useEffect(()=>{
+    const interval = setInterval(() => {
+      setDisplay(text.slice(0, i))
+      i++
 
-let i = 0
+      if (i > text.length) {
+        clearInterval(interval)
+      }
+    }, 50)
 
-const interval = setInterval(()=>{
+    return () => clearInterval(interval)
+  }, [text])
 
-setDisplay(text.slice(0,i))
-i++
-
-if(i > text.length){
-clearInterval(interval)
-}
-
-},50)
-
-},[text])
-
-return <div className="typewriter">{display}</div>
-
+  return <div className="typewriter">{display}</div>
 }
 
 export default TypeWriter

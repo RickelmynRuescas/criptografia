@@ -11,24 +11,16 @@ CORS(app, resources={r"/*": {"origins": "*"}})
 
 mensagens = {}
 
-@app.route("/")
-def home():
-    return jsonify({"status": "API online"}), 200
 
-
-# ----------------------------
-# CRIPTOGRAFAR
-# ----------------------------
 @app.route("/criptografar", methods=["POST"])
 def rota_criptografar():
-
     data = request.get_json()
 
     if not data:
         return jsonify({"erro": "dados inválidos"}), 400
 
     mensagem = data.get("mensagem")
-    chave = data.get("chave") or data.get("senha")
+    chave = data.get("chave")
 
     if not mensagem or not chave:
         return jsonify({"erro": "mensagem ou chave vazia"}), 400
@@ -41,19 +33,15 @@ def rota_criptografar():
         return jsonify({"erro": "erro interno"}), 500
 
 
-# ----------------------------
-# CRIAR LINK
-# ----------------------------
 @app.route("/criar-link", methods=["POST"])
 def criar_link():
-
     data = request.get_json()
 
     if not data:
         return jsonify({"erro": "dados inválidos"}), 400
 
     mensagem = data.get("mensagem")
-    chave = data.get("chave") or data.get("senha")
+    chave = data.get("chave")
 
     if not mensagem or not chave:
         return jsonify({"erro": "mensagem ou chave vazia"}), 400
@@ -70,18 +58,13 @@ def criar_link():
         }
 
         return jsonify({"link": id_link})
-
     except Exception as e:
         print("ERRO LINK:", e)
         return jsonify({"erro": "erro interno"}), 500
 
 
-# ----------------------------
-# PEGAR MENSAGEM
-# ----------------------------
 @app.route("/mensagem/<id>", methods=["GET"])
 def ver_mensagem(id):
-
     if id not in mensagens:
         return jsonify({"erro": "não existe"}), 404
 
@@ -94,15 +77,12 @@ def ver_mensagem(id):
     if msg["visualizado"]:
         return jsonify({"erro": "já visualizada"}), 403
 
+    msg["visualizado"] = True
     return jsonify({"mensagem": msg["mensagem"]})
 
 
-# ----------------------------
-# DESTRUIR
-# ----------------------------
 @app.route("/destruir/<id>", methods=["DELETE"])
 def destruir(id):
-
     if id in mensagens:
         del mensagens[id]
         return jsonify({"ok": True})
@@ -110,19 +90,15 @@ def destruir(id):
     return jsonify({"erro": "não encontrada"}), 404
 
 
-# ----------------------------
-# DESCRIPTOGRAFAR
-# ----------------------------
 @app.route("/descriptografar", methods=["POST"])
 def rota_descriptografar():
-
     data = request.get_json()
 
     if not data:
         return jsonify({"erro": "dados inválidos"}), 400
 
     cript = data.get("cript")
-    chave = data.get("chave") or data.get("senha")
+    chave = data.get("chave")
 
     if not cript or not chave:
         return jsonify({"erro": "dados incompletos"}), 400
@@ -131,11 +107,6 @@ def rota_descriptografar():
         resultado = descriptografar(cript, chave)
 
         if resultado:
-            for id_link, msg in mensagens.items():
-                if msg["mensagem"] == cript:
-                    msg["visualizado"] = True
-                    break
-
             return jsonify({"resultado": resultado})
         else:
             return jsonify({"erro": "senha incorreta"}), 400
@@ -143,6 +114,11 @@ def rota_descriptografar():
     except Exception as e:
         print("ERRO DESCRIPTO:", e)
         return jsonify({"erro": "erro interno"}), 500
+
+
+@app.route("/health", methods=["GET"])
+def health():
+    return jsonify({"status": "ok"})
 
 
 if __name__ == "__main__":
